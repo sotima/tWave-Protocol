@@ -57,7 +57,7 @@
 struct twave_config {
     uint8_t  thisNodeID     = NODE_ID;
     uint8_t  networkID      = TWAVE_NETWORK_ID;
-    uint8_t  powerLevel     = 13;
+    uint8_t  powerLevel     = TWAVE_POWER_LEVEL;
     uint8_t  noOfRetries    = 5;
     uint8_t  modemConfig    = 0;   // 0=GFSK_Rb250Fd250, 1=GFSK_Rb125Fd125, 2=GFSK_Rb55555Fd50
     uint8_t  sendStatusTo   = 0;
@@ -95,7 +95,7 @@ inline void twave_validateConfig(twave_config& cfg, uint8_t defaultNodeID) {
         cfg.networkID = TWAVE_NETWORK_ID;
     }
     if (cfg.powerLevel > 20) {
-        cfg.powerLevel = 13;
+        cfg.powerLevel = TWAVE_POWER_LEVEL;
     }
     if (cfg.noOfRetries > 10 || cfg.noOfRetries < 1) {
         cfg.noOfRetries = 5;

@@ -1,0 +1,17 @@
+{
+  "name": "tWave-Protocol",
+  "version": "0.1.0",
+  "description": "Gemeinsame Payload-Structs, Session-Key-Protokoll und Konfiguration fuer das tWave Smart-Home-System (ATmega328P + ESP32).",
+  "keywords": ["rfm69", "radiohead", "smarthome", "atmega328p", "esp32", "twave"],
+  "authors": {
+    "name": "Matthias Tieben"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sotima/tWave-Protocol.git"
+  },
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": ["atmelavr", "espressif32"],
+  "headers": "src/tWaveProtocol.h"
+}

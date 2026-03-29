@@ -15,9 +15,9 @@
 #define TWAVE_MSG_SESSION_REQUEST  'S'   // sessionRequest
 #define TWAVE_MSG_SESSION_KEY      'K'   // payload_K
 #define TWAVE_MSG_COMMAND          'C'   // payload_C
-#define TWAVE_MSG_STATUS_SHUTTER   'R'   // payload_R  (Rolllade)
-#define TWAVE_MSG_STATUS_SWITCH    's'   // payload_R  (Schalter/Steckdose)
-#define TWAVE_MSG_STATUS_VALVE     'v'   // payload_L  (Ventil)
+#define TWAVE_MSG_STATUS_SHUTTER   'R'   // twave_payload_actuator  (Rolllade)
+#define TWAVE_MSG_STATUS_SWITCH    's'   // twave_payload_actuator  (Schalter/Steckdose)
+#define TWAVE_MSG_STATUS_VALVE     'v'   // twave_payload_actuator  (Ventil)
 #define TWAVE_MSG_ENVIRONMENT      'E'   // payload_E  (Sensor)
 #define TWAVE_MSG_MAINTENANCE      'M'   // payload_M
 #define TWAVE_MSG_MAINT_REPLY      'N'   // payload_N
@@ -53,20 +53,7 @@ struct twave_payload_C {
 
 /* --- Status --- */
 
-struct twave_payload_R {    // Rolllade und Schalter/Steckdose
-    uint8_t  type;
-    uint8_t  ReceiverAddress;
-    uint8_t  channel;
-    uint8_t  isMoving;
-    uint8_t  success;
-    uint8_t  toggleMode;
-    uint16_t reserved2;
-    uint32_t actPosition;
-    uint32_t maxPosition;
-    uint32_t SessionKey;
-};
-
-struct twave_payload_L {    // Ventil (bitweise identisch mit payload_R)
+struct twave_payload_actuator {    // Alle Aktoren (Rolllade, Schalter/Steckdose, Ventil)
     uint8_t  type;
     uint8_t  ReceiverAddress;
     uint8_t  channel;
@@ -140,8 +127,7 @@ struct twave_channelState {
 static_assert(sizeof(twave_sessionRequest) == 4,  "sessionRequest size mismatch");
 static_assert(sizeof(twave_payload_K)      == 8,  "payload_K size mismatch");
 static_assert(sizeof(twave_payload_C)      == 12, "payload_C size mismatch");
-static_assert(sizeof(twave_payload_R)      == 20, "payload_R size mismatch");
-static_assert(sizeof(twave_payload_L)      == 20, "payload_L size mismatch");
+static_assert(sizeof(twave_payload_actuator) == 20, "payload_actuator size mismatch");
 static_assert(sizeof(twave_payload_E)      == 16, "payload_E size mismatch");
 static_assert(sizeof(twave_payload_M)      == 4,  "payload_M size mismatch");
 static_assert(sizeof(twave_payload_N)      == 8,  "payload_N size mismatch");
@@ -151,8 +137,7 @@ static_assert(sizeof(twave_payload_X)      == 12, "payload_X size mismatch");
 typedef twave_sessionRequest sessionRequest;
 typedef twave_payload_K      payload_K;
 typedef twave_payload_C      payload_C;
-typedef twave_payload_R      payload_R;
-typedef twave_payload_L      payload_L;
+typedef twave_payload_actuator payload_R;
 typedef twave_payload_E      payload_E;
 typedef twave_payload_M      payload_M;
 typedef twave_payload_N      payload_N;

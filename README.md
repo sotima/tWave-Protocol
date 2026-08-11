@@ -217,6 +217,16 @@ lib_deps =
 
 ## Bekannte Besonderheiten
 
+- **Default-Initialisierer für `type` sind Teil des Protokolls, kein Komfort.**
+  Die sendenden Stellen (Gateway, Handsender) legen ihre Payload-Structs als
+  Globals an und setzen nur die Nutzfelder — das Type-Byte kommt allein aus dem
+  Default. Fehlt er, landet das Struct in `.bss`, das Type-Byte ist 0 und kein
+  Empfänger erkennt die Nachricht. Genau das ist in v0.1.0 passiert:
+  `twave_sessionRequest` und `twave_payload_C` hatten den Default verloren, der
+  Handsender war dadurch von v0.1.0 bis v0.2.1 funktionsunfähig (behoben in
+  v0.2.2). Einzige bewusste Ausnahme ist `twave_payload_actuator`, weil es sieben
+  verschiedene Type-Bytes bedient — dort setzt der Node ihn selbst.
+
 - **`payload_R` vs. `payload_L`:** ✅ erledigt in v0.1.0 — zu `twave_payload_actuator`
   zusammengeführt, `payload_R` bleibt als Alias.
 - **Stack-Puffer in `createSessionKey`:** ✅ erledigt in v0.2.0 — die alte

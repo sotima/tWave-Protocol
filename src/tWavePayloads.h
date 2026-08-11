@@ -57,7 +57,7 @@
 /* --- Session --- */
 
 struct twave_sessionRequest {
-    uint8_t  type;       // 'S'
+    uint8_t  type        = TWAVE_MSG_SESSION_REQUEST;
     uint8_t  reserved;
     uint16_t magic;
 };
@@ -72,7 +72,7 @@ struct twave_payload_K {
 /* --- Command --- */
 
 struct twave_payload_C {
-    uint8_t  type;
+    uint8_t  type        = TWAVE_MSG_COMMAND;
     uint8_t  cmdType;       // 1=Verfahren, 2=Anlernen, 3=Pairen, 4=Status, 5=Ablernen
     uint8_t  channel;
     uint8_t  newState;      // 1=AN/HOCH, 2=AUS/RUNTER, 3=Ziel anfahren
@@ -85,6 +85,9 @@ struct twave_payload_C {
 /* --- Status --- */
 
 struct twave_payload_actuator {    // Alle Aktoren (Rolllade, Schalter/Steckdose, Ventil)
+    // ABSICHTLICH ohne Default: dieses Struct bedient sieben verschiedene
+    // Type-Bytes ('R','r','s','t','l','v','p'). Der Node MUSS type selbst setzen,
+    // sonst legt Home Assistant das falsche oder gar kein Geraet an.
     uint8_t  type;
     uint8_t  ReceiverAddress;
     uint8_t  channel;
@@ -111,7 +114,7 @@ struct twave_payload_E {
 /* --- Maintenance --- */
 
 struct twave_payload_M {
-    uint8_t type;
+    uint8_t type      = TWAVE_MSG_MAINTENANCE;
     uint8_t cmd;
     uint8_t param1;
     uint8_t param2;

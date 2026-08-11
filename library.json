@@ -1,6 +1,6 @@
 {
   "name": "tWave-Protocol",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Gemeinsame Payload-Structs, Session-Key-Protokoll und Konfiguration fuer das tWave Smart-Home-System (ATmega328P + ESP32).",
   "keywords": ["rfm69", "radiohead", "smarthome", "atmega328p", "esp32", "twave"],
   "authors": {

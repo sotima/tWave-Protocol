@@ -18,3 +18,5 @@
 #include "tWaveDebug.h"
 #include "tWaveConfig.h"
 #include "tWavePayloads.h"
+#include "tWaveSession.h"
+#include "tWaveMaintenance.h"

@@ -23,13 +23,18 @@ tWave-Protocol/
 │   ├── tWavePayloads.h           ← Header-only: alle Payload-Structs
 │   ├── tWaveConfig.h             ← Header-only: _config Struct + Validierung
 │   ├── tWaveDebug.h              ← Header-only: ersetzt debugUtils.h
-│   ├── tWaveSession.h / .cpp     ← Session-Key-Logik (Sender- und Empfänger-Seite)
-│   └── tWaveMaintenance.h / .cpp ← Maintenance-Protokoll-Handler
+│   ├── tWaveSession.h            ← Header-only: Session-Key-Logik
+│   └── tWaveMaintenance.h        ← Header-only: Maintenance-Antworten
 │
 └── examples/
     ├── ReceiverNode/ReceiverNode.ino
     └── SenderNode/SenderNode.ino
 ```
+
+Die gesamte Bibliothek ist header-only (`inline`). Ursprünglich waren
+`tWaveSession` und `tWaveMaintenance` als `.h/.cpp` geplant; da alle Funktionen
+sehr klein sind, spart das Inlining auf dem ATmega328P Flash und Aufrufoverhead —
+und ungenutzte Funktionen kosten gar nichts.
 
 ---
 
@@ -42,8 +47,9 @@ tWave-Protocol/
 | `S`  | `twave_sessionRequest` | Session-Anfrage (Sender → Empfänger)           |
 | `K`  | `twave_payload_K`   | Session-Key-Antwort (Empfänger → Sender)          |
 | `C`  | `twave_payload_C`   | Kommando (Sender → Empfänger, mit SessionKey)     |
-| `R`  | `twave_payload_R`   | Rollladenstatus (Empfänger → Sender/Gateway)      |
-| `v`  | `twave_payload_L`   | Ventilstatus (Empfänger → Sender/Gateway)         |
+| `R`  | `twave_payload_actuator` | Rollladenstatus (Empfänger → Sender/Gateway) |
+| `s`  | `twave_payload_actuator` | Schalter-/Steckdosenstatus                   |
+| `v`  | `twave_payload_actuator` | Ventilstatus (Empfänger → Sender/Gateway)    |
 | `E`  | `twave_payload_E`   | Umgebungsdaten / Sensor (Node → Gateway)          |
 | `M`  | `twave_payload_M`   | Maintenance-Befehl (Gateway → Node)               |
 | `N`  | `twave_payload_N`   | Maintenance-Antwort (Node → Gateway)              |
@@ -116,9 +122,10 @@ typedef twave_payload_C payload_C;  // Deprecated, wird in v2.0 entfernt
 
 ## Implementierungsreihenfolge
 
-### Phase 1 — MVP
+### Phase 1 — MVP ✅ abgeschlossen (v0.1.0)
 
 Eliminiert ~150–200 Zeilen Duplikation pro Node ohne Verhaltensänderung.
+Alle 5 Nodes migriert und auf Hardware getestet.
 
 1. **`tWavePayloads.h`** — alle Structs mit `#pragma pack(1)`
 2. **`tWaveConfig.h`** — `twave_config` Struct mit `NODE_ID`-Default + Validierungsfunktion
@@ -133,10 +140,16 @@ lib_deps =
   ${PROJECT_DIR}/../tWave-Protocol
 ```
 
-### Phase 2 — Session & Maintenance
+### Phase 2 — Session & Maintenance ✅ Bibliothek fertig (v0.2.0), Nodes noch nicht migriert
 
-5. **`tWaveMaintenance.h/.cpp`** — `twave_buildMaintenanceReply()` + Kommando-Konstanten
-6. **`tWaveSession.h/.cpp`** — `twave_createSessionKey()`, `twave_verifyCommandKey()`, `twave_session_state`
+5. **`tWaveMaintenance.h`** — `twave_buildMaintenanceReply()`, `twave_maintenanceAllowed()`,
+   optional `twave_sendMaintenanceReply()`
+6. **`tWaveSession.h`** — `twave_createSessionKey()`, `twave_verifyCommandKey()`,
+   `twave_session_state`, optional `twave_sendSessionKey()`
+
+Die `twave_send*()`-Helfer sind mit `#ifdef RHReliableDatagram_h` geklammert und
+existieren nur, wenn RadioHead vor `tWaveProtocol.h` eingebunden wurde. Damit
+bleibt die Bibliothek auch ohne RadioHead übersetzbar (z. B. für Host-Tests).
 
 Beispiel nach Migration:
 
@@ -186,11 +199,16 @@ lib_deps =
 
 ## Bekannte Besonderheiten
 
-- **`payload_R` vs. `payload_L`:** Bitweise identische Structs, unterscheiden sich nur im
-  Typ-Buchstaben (`R` für Rollläden, `v` für Ventile). Konsolidierung in Phase 3.
-- **Stack-Bug in `createSessionKey`:** Bisheriger Code allokiert lokal
-  `uint8_t data[66]` auf dem Stack. Die Library-Version behebt das, indem der
-  Aufrufer `tx_buf` (global) übergibt.
+- **`payload_R` vs. `payload_L`:** ✅ erledigt in v0.1.0 — zu `twave_payload_actuator`
+  zusammengeführt, `payload_R` bleibt als Alias.
+- **Stack-Puffer in `createSessionKey`:** ✅ erledigt in v0.2.0 — die alte
+  Node-Implementierung legt `uint8_t data[RH_RF69_MAX_MESSAGE_LEN]` (60 Byte) auf
+  dem Stack an und sendet den kompletten Puffer. `twave_createSessionKey()` füllt
+  nur noch das 8-Byte-Struct, das der Aufrufer direkt verschickt.
+- **Verkürzte `K`-Nachricht:** Damit gehen statt 60 nur noch 8 Byte über die Luft.
+  Beide bekannten Empfänger (ESP32-Gateway `main.cpp`, Handsender) lesen die
+  Antwort per `memcpy` fester Länge und prüfen die Payload-Länge nicht — die
+  Änderung ist abwärtskompatibel. Bei neuen Empfängern darauf achten.
 - **`NODE_ID`-Fallback:** `#ifndef NODE_ID #define NODE_ID 1 #endif` verhindert
   Compiler-Fehler wenn kein Build-Flag gesetzt ist.
 - **ESP32-Padding:** Nach erster ESP32-Integration `sizeof()`-Checks mit

@@ -42,18 +42,36 @@ und ungenutzte Funktionen kosten gar nichts.
 
 ### Payload-Typen
 
-| Typ  | Struct              | Beschreibung                                      |
-|------|---------------------|---------------------------------------------------|
-| `S`  | `twave_sessionRequest` | Session-Anfrage (Sender → Empfänger)           |
-| `K`  | `twave_payload_K`   | Session-Key-Antwort (Empfänger → Sender)          |
-| `C`  | `twave_payload_C`   | Kommando (Sender → Empfänger, mit SessionKey)     |
-| `R`  | `twave_payload_actuator` | Rollladenstatus (Empfänger → Sender/Gateway) |
-| `s`  | `twave_payload_actuator` | Schalter-/Steckdosenstatus                   |
-| `v`  | `twave_payload_actuator` | Ventilstatus (Empfänger → Sender/Gateway)    |
-| `E`  | `twave_payload_E`   | Umgebungsdaten / Sensor (Node → Gateway)          |
-| `M`  | `twave_payload_M`   | Maintenance-Befehl (Gateway → Node)               |
-| `N`  | `twave_payload_N`   | Maintenance-Antwort (Node → Gateway)              |
-| `X`  | `twave_payload_X`   | Extended Maintenance / Konfiguration              |
+| Typ | Konstante                  | Struct                   | HA-Domain       | Beschreibung                        |
+|-----|----------------------------|--------------------------|-----------------|-------------------------------------|
+| `S` | `TWAVE_MSG_SESSION_REQUEST`| `twave_sessionRequest`   | –               | Session-Anfrage (Sender → Empfänger)|
+| `K` | `TWAVE_MSG_SESSION_KEY`    | `twave_payload_K`        | –               | Session-Key-Antwort                 |
+| `C` | `TWAVE_MSG_COMMAND`        | `twave_payload_C`        | –               | Kommando (mit SessionKey)           |
+| `M` | `TWAVE_MSG_MAINTENANCE`    | `twave_payload_M`        | –               | Maintenance-Befehl (Gateway → Node) |
+| `N` | `TWAVE_MSG_MAINT_REPLY`    | `twave_payload_N`        | –               | Maintenance-Antwort (Node → Gateway)|
+| `X` | `TWAVE_MSG_MAINT_EXTENDED` | `twave_payload_X`        | –               | Extended Maintenance / Konfiguration|
+| `R` | `TWAVE_MSG_STATUS_SHUTTER` | `twave_payload_actuator` | `cover`/shutter | Rolllade mit Position               |
+| `r` | `TWAVE_MSG_STATUS_GARAGE`  | `twave_payload_actuator` | `cover`/garage  | Rolllade ohne Position (auf/zu)     |
+| `s` | `TWAVE_MSG_STATUS_SWITCH`  | `twave_payload_actuator` | `switch`        | Schalter / Steckdose                |
+| `t` | `TWAVE_MSG_STATUS_TRIGGER` | `twave_payload_actuator` | `button`        | An für `motorDelay`, dann aus       |
+| `l` | `TWAVE_MSG_STATUS_LOCK`    | `twave_payload_actuator` | `lock`          | Schloss                             |
+| `v` | `TWAVE_MSG_STATUS_VALVE`   | `twave_payload_actuator` | `valve`         | Ventil                              |
+| `p` | `TWAVE_MSG_STATUS_PLAYER`  | `twave_payload_actuator` | `number`+`button`| MP3-Player (Titel/Volume)          |
+| `E` | `TWAVE_MSG_ENVIRONMENT`    | `twave_payload_E`        | `sensor`        | Temp/Hum/Druck/Batterie             |
+| `B` | `TWAVE_MSG_BOOLEAN`        | –                        | `binary_sensor` | Zustand 0/1                         |
+| `m` | `TWAVE_MSG_MOTION`         | –                        | `binary_sensor` | wie `B`, aber `off_delay` 5 s       |
+| `G` | `TWAVE_MSG_GASMETER`       | –                        | `sensor`        | Gaszähler (32 Bit)                  |
+| `J` | `TWAVE_MSG_JOYSTICK`       | –                        | –               | Handler im Gateway, keine Discovery |
+| `A` | `TWAVE_MSG_ACCELERATION`   | –                        | –               | Handler im Gateway, keine Discovery |
+| `g` | `TWAVE_MSG_GATEWAY_STATUS` | –                        | `sensor`        | Gateway selbst (rssi/ram/temp/…)    |
+
+Die HA-Domain wird im Gateway allein aus dem Type-Byte abgeleitet
+(`sendDiscoveryMessage()`), das der Node sendet — ein falscher Buchstabe legt
+also das falsche Home-Assistant-Gerät an.
+
+> **Groß-/Kleinschreibung beachten:** `S`↔`s`, `M`↔`m`, `G`↔`g` und `R`↔`r` sind
+> jeweils zwei völlig verschiedene Nachrichtentypen. Immer die Konstanten
+> verwenden, nie die Zeichenliterale.
 
 ### Session-Key-Protokoll (S → K → C)
 

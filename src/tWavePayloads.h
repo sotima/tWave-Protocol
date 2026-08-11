@@ -11,17 +11,48 @@
 
 #pragma pack(push, 1)
 
-/* --- Message Type Bytes --- */
-#define TWAVE_MSG_SESSION_REQUEST  'S'   // sessionRequest
-#define TWAVE_MSG_SESSION_KEY      'K'   // payload_K
-#define TWAVE_MSG_COMMAND          'C'   // payload_C
-#define TWAVE_MSG_STATUS_SHUTTER   'R'   // twave_payload_actuator  (Rolllade)
-#define TWAVE_MSG_STATUS_SWITCH    's'   // twave_payload_actuator  (Schalter/Steckdose)
-#define TWAVE_MSG_STATUS_VALVE     'v'   // twave_payload_actuator  (Ventil)
-#define TWAVE_MSG_ENVIRONMENT      'E'   // payload_E  (Sensor)
-#define TWAVE_MSG_MAINTENANCE      'M'   // payload_M
-#define TWAVE_MSG_MAINT_REPLY      'N'   // payload_N
-#define TWAVE_MSG_MAINT_EXTENDED   'X'   // payload_X
+/* --- Message Type Bytes ---
+ *
+ * ACHTUNG: Vier Paare unterscheiden sich nur in der Gross-/Kleinschreibung und
+ * bedeuten voellig Verschiedenes:
+ *
+ *   'S' Session-Request   <-> 's' Schalter-Status
+ *   'M' Maintenance       <-> 'm' Motion-Sensor
+ *   'G' Gaszaehler        <-> 'g' Gateway-Status
+ *   'R' Rolllade m. Pos.  <-> 'r' Rolllade o. Pos.
+ *
+ * Ein vertippter Buchstabe faellt daher nicht auf, sondern wird vom Gateway als
+ * anderer Nachrichtentyp interpretiert. Immer diese Konstanten verwenden, nie
+ * die Zeichenliterale.
+ */
+
+/* Protokoll / Steuerung */
+#define TWAVE_MSG_SESSION_REQUEST  'S'   // twave_sessionRequest
+#define TWAVE_MSG_SESSION_KEY      'K'   // twave_payload_K
+#define TWAVE_MSG_COMMAND          'C'   // twave_payload_C
+#define TWAVE_MSG_MAINTENANCE      'M'   // twave_payload_M  (Gateway -> Node)
+#define TWAVE_MSG_MAINT_REPLY      'N'   // twave_payload_N  (Node -> Gateway)
+#define TWAVE_MSG_MAINT_EXTENDED   'X'   // twave_payload_X
+
+/* Aktor-Status — alle mit twave_payload_actuator, HA-Domain haengt am Type-Byte */
+#define TWAVE_MSG_STATUS_SHUTTER   'R'   // cover / shutter  — Rolllade mit Position
+#define TWAVE_MSG_STATUS_GARAGE    'r'   // cover / garage   — Rolllade ohne Position (auf/zu)
+#define TWAVE_MSG_STATUS_SWITCH    's'   // switch           — Schalter / Steckdose
+#define TWAVE_MSG_STATUS_TRIGGER   't'   // button           — an fuer motorDelay, dann aus
+#define TWAVE_MSG_STATUS_LOCK      'l'   // lock
+#define TWAVE_MSG_STATUS_VALVE     'v'   // valve
+#define TWAVE_MSG_STATUS_PLAYER    'p'   // number + button  — MP3-Player (Titel/Volume)
+
+/* Sensor-Status */
+#define TWAVE_MSG_ENVIRONMENT      'E'   // twave_payload_E  — Temp/Hum/Druck/Batterie
+#define TWAVE_MSG_BOOLEAN          'B'   // binary_sensor    — Zustand 0/1
+#define TWAVE_MSG_MOTION           'm'   // binary_sensor    — wie 'B', aber off_delay 5 s
+#define TWAVE_MSG_GASMETER         'G'   // sensor           — Gaszaehler (32 Bit)
+#define TWAVE_MSG_JOYSTICK         'J'   // (noch keine HA-Discovery im Gateway)
+#define TWAVE_MSG_ACCELERATION     'A'   // (noch keine HA-Discovery im Gateway)
+
+/* Gateway selbst */
+#define TWAVE_MSG_GATEWAY_STATUS   'g'   // sensor — status/rssi/ram/temp/hum/baro/iaq
 
 /* --- Session --- */
 

@@ -111,6 +111,12 @@ Der SESSIONKEY läuft nach `config.sessionTimeout` (Default: 2500 ms) ab.
 
 ### Maintenance-Kommandos
 
+Als `TWAVE_MAINT_*` in `tWavePayloads.h` (bis v0.2.3 in `tWaveConfig.h`) —
+zusammen mit `TWAVE_EVENT_*` und `TWAVE_REPORT_STARTUP`, weil sie Feldinhalte
+des Protokolls beschreiben und nicht die Node-Konfiguration. Wer nur die
+Konstanten braucht, kommt damit ohne `tWaveConfig.h` aus, das den generischen
+Alias `_config` mitbringt.
+
 | CMD | Beschreibung                       |
 |-----|------------------------------------|
 | 100 | Reset (ruft `setup()` neu auf)     |

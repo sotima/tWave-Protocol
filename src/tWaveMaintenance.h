@@ -17,9 +17,8 @@
  * ein Node unaufgefordert nach dem Booten schickt.
  */
 
-/* --- Antwort-Codes ohne zugehöriges Kommando --- */
-
-#define TWAVE_REPORT_STARTUP  1   // Bootmeldung: param1=NodeID, param2=PowerLevel
+/* TWAVE_REPORT_STARTUP steht in tWavePayloads.h bei den übrigen
+ * cmd-Feldwerten und kommt über den Include oben mit. */
 
 /**
  * Baut eine Maintenance-Antwort.

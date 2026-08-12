@@ -1,9 +1,16 @@
 #pragma once
 
 #include <stdint.h>
+#include "tWavePayloads.h"   // TWAVE_MAINT_* / TWAVE_EVENT_* liegen dort
 
 /**
  * tWave Protocol — Netzwerkkonfiguration und Node-Config-Struct
+ *
+ * ACHTUNG: Dieser Header definiert den Alias `_config`. Der Name ist generisch
+ * und kollidiert z.B. mit dem gleichnamigen Config-Struct des ESP32-Gateways.
+ * Wer nur die Protokoll-Konstanten oder die Payload-Structs braucht, bindet
+ * stattdessen tWavePayloads.h ein — dort sind die Maintenance- und
+ * Event-Kommandos ebenfalls zu finden.
  */
 
 /* --- Netzwerk-Konstanten (müssen auf allen Nodes gleich sein) --- */
@@ -25,24 +32,9 @@
   #endif
 #endif
 
-/* --- Maintenance-Kommando-Nummern --- */
-
-#define TWAVE_MAINT_RESET              100
-#define TWAVE_MAINT_NODEID_SET         101   // NodeID ändern, kein Neustart
-#define TWAVE_MAINT_NODEID_SET_RESTART 102   // NodeID ändern, mit Neustart
-#define TWAVE_MAINT_NETWORKID_SET      103   // NetworkID ändern, kein Neustart
-#define TWAVE_MAINT_NETWORKID_RESTART  104   // NetworkID ändern, mit Neustart
-#define TWAVE_MAINT_POWERLEVEL_SET     105   // TxPower ändern
-#define TWAVE_MAINT_FORCE_PAIRING      128   // Pairing-Modus erzwingen
-#define TWAVE_MAINT_ERASE_CONFIG       155   // Konfiguration löschen (EEPROM)
-#define TWAVE_MAINT_READ_CONFIG        160   // Aktuelle Konfiguration auslesen
-
-/* --- Event-Konstanten (Fahrbefehle) --- */
-
-#define TWAVE_EVENT_HALT    0
-#define TWAVE_EVENT_UP      1
-#define TWAVE_EVENT_DOWN    2
-#define TWAVE_EVENT_TARGET  3
+/* TWAVE_MAINT_* und TWAVE_EVENT_* sind nach tWavePayloads.h gewandert — sie
+ * beschreiben Feldinhalte des Protokolls, nicht die Node-Konfiguration. Über
+ * den Include oben bleiben sie hier unverändert verfügbar. */
 
 /* --- NODE_ID Fallback --- */
 

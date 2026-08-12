@@ -54,6 +54,29 @@
 /* Gateway selbst */
 #define TWAVE_MSG_GATEWAY_STATUS   'g'   // sensor — status/rssi/ram/temp/hum/baro/iaq
 
+/* --- Maintenance-Kommando-Nummern (cmd-Feld von twave_payload_M) --- */
+
+/* Antwort-Code ohne zugehöriges Kommando: die Startmeldung, die ein Node
+ * unaufgefordert nach dem Booten schickt (param1=NodeID, param2=PowerLevel). */
+#define TWAVE_REPORT_STARTUP             1
+
+#define TWAVE_MAINT_RESET              100
+#define TWAVE_MAINT_NODEID_SET         101   // NodeID ändern, kein Neustart
+#define TWAVE_MAINT_NODEID_SET_RESTART 102   // NodeID ändern, mit Neustart
+#define TWAVE_MAINT_NETWORKID_SET      103   // NetworkID ändern, kein Neustart
+#define TWAVE_MAINT_NETWORKID_RESTART  104   // NetworkID ändern, mit Neustart
+#define TWAVE_MAINT_POWERLEVEL_SET     105   // TxPower ändern
+#define TWAVE_MAINT_FORCE_PAIRING      128   // Pairing-Modus erzwingen
+#define TWAVE_MAINT_ERASE_CONFIG       155   // Konfiguration löschen (EEPROM)
+#define TWAVE_MAINT_READ_CONFIG        160   // Aktuelle Konfiguration auslesen
+
+/* --- Event-Konstanten (newState-Feld von twave_payload_C) --- */
+
+#define TWAVE_EVENT_HALT    0
+#define TWAVE_EVENT_UP      1
+#define TWAVE_EVENT_DOWN    2
+#define TWAVE_EVENT_TARGET  3
+
 /* --- Session --- */
 
 struct twave_sessionRequest {

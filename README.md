@@ -26,10 +26,30 @@ tWave-Protocol/
 │   ├── tWaveSession.h            ← Header-only: Session-Key-Logik
 │   └── tWaveMaintenance.h        ← Header-only: Maintenance-Antworten
 │
+├── test/
+│   ├── run_tests.sh              ← Wire-Format-Test (AVR + ESP32)
+│   ├── test_wire_layout.cpp      ← static_asserts auf Groessen und Offsets
+│   └── gateway_reference.h       ← eingefrorene Gateway-Structs (Gegenprobe)
+│
 └── examples/
     ├── ReceiverNode/ReceiverNode.ino
     └── SenderNode/SenderNode.ino
 ```
+
+### Tests
+
+```bash
+./test/run_tests.sh
+```
+
+Prüft, dass sich das Byte-Layout der Structs nicht unbemerkt ändert — auf beiden
+Zielplattformen und gegen das noch nicht migrierte Gateway. Reiner
+Compile-Zeit-Test, keine Hardware nötig. Details in [`test/README.md`](test/README.md).
+
+**Vor jeder Änderung an `tWavePayloads.h` oder `tWaveConfig.h` ausführen.** Die
+Structs gehen ohne Längen- oder Versionskennung über die Funkstrecke; ein
+verschobenes Feld bricht die Verständigung mit allen nicht neu geflashten Nodes,
+ohne dass es einen Fehler gibt.
 
 Die gesamte Bibliothek ist header-only (`inline`). Ursprünglich waren
 `tWaveSession` und `tWaveMaintenance` als `.h/.cpp` geplant; da alle Funktionen
